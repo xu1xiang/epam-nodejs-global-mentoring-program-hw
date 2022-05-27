@@ -4,3 +4,5 @@ tasks/task2/1.txt
 node_modules
 
 yarn-error.log
+
+.DS_Store
