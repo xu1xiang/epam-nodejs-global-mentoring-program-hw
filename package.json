@@ -6,9 +6,13 @@
   "repository": "git@github.com:xu1xiang/epam-nodejs-global-mentoring-program-hw.git",
   "license": "MIT",
   "scripts": {
-    "task1": "nodemon tasks/task1/index.ts",
-    "task2": "nodemon tasks/task2/index.ts",
-    "task3": "nodemon tasks/task3/index.ts"
+    "task1": "node dist/task1/index.js",
+    "task2": "node dist/task2/index.js",
+    "task3": "node dist/task3/index.js",
+    "task1:dev": "nodemon tasks/task1/index.ts",
+    "task2:dev": "nodemon tasks/task2/index.ts",
+    "task3:dev": "nodemon tasks/task3/index.ts",
+    "postinstall": "tsc"
   },
   "prettier": {
     "singleQuote": true,
