@@ -36,7 +36,7 @@ export type UpdateBody = Partial<Omit<User, 'id' | 'login' | 'isDeleted'>>
 export const updateUser = async (id: string, data: UpdateBody) => {
   const index = userList.findIndex((item) => item.id === id)
   if (index === -1) {
-    throw new Error(`user '${id}' not found`)
+    return
   }
 
   const raw = userList[index]
@@ -51,7 +51,7 @@ export const updateUser = async (id: string, data: UpdateBody) => {
 export const deleteUser = async (id: string) => {
   const index = userList.findIndex((item) => item.id === id)
   if (index === -1) {
-    throw new Error(`user '${id}' not found`)
+    return
   }
   const { isDeleted, ...rest } = userList[index]
   const result = {
