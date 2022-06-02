@@ -1,20 +1,17 @@
 import { RequestHandler } from 'express'
 import joi from 'joi'
-import { BadRequestError, InternalServerError } from './Errors'
-import type { CreateBody, UpdateBody, User } from './model'
-import * as userModel from './model'
+import { BadRequestError, NotfoundError } from './Errors'
+import { userModel } from './models'
 import api, { SuccessResponse } from './responseHandler'
-
-joi.string().validate({}).error
 
 export const listUsersHander: RequestHandler<
   unknown,
-  SuccessResponse<User[]>,
+  SuccessResponse<Model.User[]>,
   unknown,
   { limit: string }
 > = async (req, res) => {
   const { limit = '10' } = req.query
-  const data = await userModel.listUser(parseInt(limit))
+  const data = await userModel.listUsers(parseInt(limit))
   res.json(api.ok(data))
 }
 
@@ -27,9 +24,10 @@ const createUserValidationSchema = joi.object({
   age: joi.number().min(4).max(130).required(),
 })
 
+type CreateBody = Omit<Model.User, 'id' | 'isDeleted'>
 export const createUser: RequestHandler<
   unknown,
-  SuccessResponse<User>,
+  SuccessResponse<Model.User>,
   CreateBody
 > = async (req, res, next) => {
   try {
@@ -47,7 +45,7 @@ const getUserValidationSchema = joi.object({
 })
 export const getUser: RequestHandler<
   { id: string },
-  SuccessResponse<User>
+  SuccessResponse<Model.User>
 > = async (req, res, next) => {
   const { id } = req.params
   try {
@@ -55,13 +53,14 @@ export const getUser: RequestHandler<
   } catch (err: any) {
     return next(new BadRequestError(err.message))
   }
-  const data = await userModel.getUser(id)
+  const data = await userModel.getUser(parseInt(id))
   if (!data) {
-    return res.status(404).json()
+    return next(new NotfoundError())
   }
   res.json(api.ok(data))
 }
 
+type UpdateBody = Partial<Omit<Model.User, 'id' | 'login' | 'isDeleted'>>
 const updateUserValidationScheme = joi.object({
   id: joi.string().required(),
   password: joi.string().regex(/^(?=.*[0-9])(?=.*[a-zA-Z])/),
@@ -69,17 +68,20 @@ const updateUserValidationScheme = joi.object({
 })
 export const updateUser: RequestHandler<
   { id: string },
-  SuccessResponse<User | undefined>,
+  SuccessResponse<Model.User>,
   UpdateBody
 > = async (req, res, next) => {
   const { id } = req.params
   try {
-    await updateUserValidationScheme.validateAsync(req.body)
+    await updateUserValidationScheme.validateAsync({ id, ...req.body })
   } catch (err: any) {
     return next(new BadRequestError(err.message))
   }
   const { password, age } = req.body
-  const data = await userModel.updateUser(id, { password, age })
+  const data = await userModel.updateUser(parseInt(id), { password, age })
+  if (!data) {
+    return next(new NotfoundError())
+  }
   res.json(api.ok(data))
 }
 
@@ -97,10 +99,9 @@ export const deleteUserHandler: RequestHandler<{ id: string }> = async (
   } catch (err: any) {
     return next(new BadRequestError(err.message))
   }
-  try {
-    const data = await userModel.deleteUser(id)
-    res.json(api.ok(data))
-  } catch (err: any) {
-    next(new InternalServerError(err.message))
+  const succssed = await userModel.deleteUser(parseInt(id))
+  if (!succssed) {
+    return next(new NotfoundError())
   }
+  res.json(api.ok(null))
 }
