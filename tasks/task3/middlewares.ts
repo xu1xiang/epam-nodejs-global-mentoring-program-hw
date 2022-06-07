@@ -19,5 +19,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
     const json = api.serverError(err.message)
     return res.status(json.code).json(json)
   }
+  console.log(err)
+
   next()
 }

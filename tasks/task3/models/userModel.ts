@@ -6,13 +6,15 @@ class UserModel {
   constructor() {
     db.schema.hasTable('users').then((res) => {
       if (!res) {
-        db.schema.createTable('users', (table) => {
-          table.increments('id').primary()
-          table.string('login', 255).notNullable()
-          table.string('password', 255).notNullable()
-          table.integer('age').checkBetween([4, 130])
-          table.boolean('is_deleted').defaultTo(false).notNullable()
-        })
+        db.schema
+          .createTable('users', (table) => {
+            table.increments('id').primary()
+            table.string('login', 255).notNullable()
+            table.string('password', 255).notNullable()
+            table.integer('age').checkBetween([4, 130])
+            table.boolean('is_deleted').defaultTo(false).notNullable()
+          })
+          .then()
       }
     })
   }

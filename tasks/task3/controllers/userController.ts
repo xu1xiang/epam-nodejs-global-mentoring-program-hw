@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express'
 import joi from 'joi'
-import { BadRequestError, NotfoundError } from './Errors'
-import { userModel } from './models'
-import api, { SuccessResponse } from './responseHandler'
+import { BadRequestError, NotfoundError } from '../Errors'
+import { userModel } from '../models'
+import api, { SuccessResponse } from '../responseHandler'
 
-export const listUsersHander: RequestHandler<
+export const listUsersHandler: RequestHandler<
   unknown,
   SuccessResponse<Model.User[]>,
   unknown,
